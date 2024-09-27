@@ -1,0 +1,38 @@
+class Plant {
+  final int? plantID; // รหัสพรรณไม้
+  final String plantName; // ชื่อพรรณไม้
+  final String scientificName; // ชื่อวิทยาศาสตร์
+  final String description; // ฟิลด์สำหรับคำอธิบาย
+  final String imageUrl; // URL ของรูปภาพ
+  
+
+  Plant({
+    this.plantID,
+    required this.plantName,
+    required this.scientificName,
+    required this.description,
+    required this.imageUrl,
+  });
+
+  // แปลงวัตถุ Plant เป็น Map เพื่อใช้ในการบันทึกในฐานข้อมูล
+  Map<String, dynamic> toMap() {
+    return {
+      'plantID': plantID,
+      'plantName': plantName,
+      'plantScientific': scientificName,
+      'description': description, 
+      'plantImage': imageUrl,
+    };
+  }
+
+  // สร้างวัตถุ Plant จาก Map ที่ดึงมาจากฐานข้อมูล
+  static Plant fromMap(Map<String, dynamic> map) {
+    return Plant(
+      plantID: map['plantID'],
+      plantName: map['plantName'],
+      scientificName: map['plantScientific'],
+      description: map['description'], 
+      imageUrl: map['plantImage'],
+    );
+  }
+}

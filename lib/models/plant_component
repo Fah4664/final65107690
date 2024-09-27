@@ -1,0 +1,29 @@
+class LandUse {
+  final int? componetID;
+  final int landUseTypeID;
+  final String landUseDescription;
+
+  LandUse({
+    this.componetID,
+    required this.landUseTypeID,
+    required this.landUseDescription,
+  });
+
+  // แปลงวัตถุ LandUseType เป็น Map เพื่อใช้ในการบันทึกในฐานข้อมูล
+  Map<String, dynamic> toMap() {
+    return {
+      'componetID': componetID,
+      'LandUseTypeID': landUseTypeID,
+      'LandUseDescription': landUseDescription,
+    };
+  }
+
+  // สร้างวัตถุ LandUseType จาก Map ที่ดึงมาจากฐานข้อมูล
+  static LandUse fromMap(Map<String, dynamic> map) {
+    return LandUse(
+      componetID: map['componetID'],
+      landUseTypeID: map['LandUseTypeID'],
+      landUseDescription: map['LandUseDescription'],
+    );
+  }
+}

@@ -1,0 +1,38 @@
+class LandUse {
+  final int? landUseID; // รหัสการใช้ประโยชน์
+  final int plantId; // รหัสพรรณไม้
+  final int componentId; // รหัสส่วนประกอบพรรณไม้
+  final int typeID; // รหัสประเภทการใช้ประโยชน์
+  final String description; // คำอธิบายการใช้ประโยชน์
+
+  // Constructor
+  LandUse({
+    this.landUseID,
+    required this.plantId,
+    required this.componentId,
+    required this.typeID,
+    required this.description,
+  });
+
+  // แปลงวัตถุ LandUse เป็น Map เพื่อใช้ในการบันทึกในฐานข้อมูล
+  Map<String, dynamic> toMap() {
+    return {
+      'LandUseID': landUseID, // ใช้ 'LandUseID' เป็นคีย์
+      'plantID': plantId,
+      'componetID': componentId,
+      'LandUseTypeID': typeID,
+      'LandUseDescription': description,
+    };
+  }
+
+  // สร้างวัตถุ LandUse จาก Map ที่ดึงมาจากฐานข้อมูล
+  static LandUse fromMap(Map<String, dynamic> map) {
+    return LandUse(
+      landUseID: map['LandUseID'], // ใช้ 'LandUseID' แทน
+      plantId: map['plantID'],
+      componentId: map['componetID'],
+      typeID: map['LandUseTypeID'],
+      description: map['LandUseDescription'],
+    );
+  }
+}

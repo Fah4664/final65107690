@@ -1,0 +1,30 @@
+class LandUseType {
+  final int? typeID; // รหัสประเภทการใช้ประโยชน์
+  final String typename; // ชื่อประเภทการใช้ประโยชน์
+  final String typeDescription; // คำอธิบายประเภทการใช้ประโยชน์
+
+  // Constructor
+  LandUseType({
+    this.typeID,
+    required this.typename,
+    required this.typeDescription,
+  });
+
+  // แปลงวัตถุ LandUseType เป็น Map เพื่อใช้ในการบันทึกในฐานข้อมูล
+  Map<String, dynamic> toMap() {
+    return {
+      'LandUseTypeID': typeID,
+      'LandUseTypeName': typename,
+      'LandUseTypeDescription': typeDescription,
+    };
+  }
+
+  // สร้างวัตถุ LandUseType จาก Map ที่ดึงมาจากฐานข้อมูล
+  static LandUseType fromMap(Map<String, dynamic> map) {
+    return LandUseType(
+      typeID: map['LandUseTypeID'],
+      typename: map['LandUseTypeName'],
+      typeDescription: map['LandUseTypeDescription'],
+    );
+  }
+}
