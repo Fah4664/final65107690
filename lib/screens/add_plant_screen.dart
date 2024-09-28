@@ -12,19 +12,18 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
   final TextEditingController _plantScientificController = TextEditingController();
   final TextEditingController _plantImageController = TextEditingController();
   final TextEditingController _landUseDescriptionController = TextEditingController();
+  final TextEditingController _landUseTypeNameController = TextEditingController(); // เพิ่มสำหรับ LandUseTypeName
+  final TextEditingController _landUseTypeDescriptionController = TextEditingController();
   
   String? _selectedComponent;
-  String? _selectedLandUseType;
-  String? _landUseTypeDescription;
+  
 
   List<Map<String, dynamic>> _components = [];
-  List<Map<String, dynamic>> _landUseTypes = [];
 
   @override
   void initState() {
     super.initState();
     _loadComponents();
-    _loadLandUseTypes();
   }
 
   Future<void> _loadComponents() async {
@@ -32,14 +31,6 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
     final components = await db.database.then((db) => db.query('plantComponent'));
     setState(() {
       _components = components;
-    });
-  }
-
-  Future<void> _loadLandUseTypes() async {
-    final db = DatabaseHelper();
-    final landUseTypes = await db.database.then((db) => db.query('LandUseType'));
-    setState(() {
-      _landUseTypes = landUseTypes;
     });
   }
 
@@ -51,23 +42,12 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
         landUseDescription: _landUseDescriptionController.text,
         plantImage: _plantImageController.text,
         componentName: _selectedComponent ?? '',
-        landUseTypeName: _selectedLandUseType ?? '',
+        landUseTypeName: _landUseTypeNameController.text,
+        landUseTypeDescription: _landUseTypeDescriptionController.text, 
       ).then((_) {
         Navigator.pop(context, true); // กลับไปที่หน้าโฮมหลังจากบันทึกข้อมูล
-        // อาจต้องเรียก setState() ในหน้าจอหลักเพื่ออัปเดตข้อมูลที่แสดง
       });
     }
-  }
-
-  void _onLandUseTypeSelected(String? value) {
-    setState(() {
-      _selectedLandUseType = value;
-      // ค้นหาคำอธิบายจากฐานข้อมูล
-      final selectedType = _landUseTypes.firstWhere(
-          (type) => type['LandUseTypeName'] == value,
-          orElse: () => {});
-      _landUseTypeDescription = selectedType.isNotEmpty ? selectedType['LandUseTypeDescription'] : null;
-    });
   }
 
   @override
@@ -110,22 +90,16 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                 },
                 validator: (value) => value == null ? 'Please select a component' : null,
               ),
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(labelText: 'Land Use Type'),
-                items: _landUseTypes.map((type) {
-                  return DropdownMenuItem<String>(
-                    value: type['LandUseTypeName'],
-                    child: Text(type['LandUseTypeName']),
-                  );
-                }).toList(),
-                onChanged: _onLandUseTypeSelected,
-                validator: (value) => value == null ? 'Please select a land use type' : null,
+              TextFormField(
+                controller: _landUseTypeNameController,
+                decoration: InputDecoration(labelText: 'Land Use Type Name'),
+                validator: (value) => value!.isEmpty ? 'Please enter a land use type name' : null,
               ),
-              if (_landUseTypeDescription != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text('Description: $_landUseTypeDescription'),
-                ),
+              TextFormField(
+                controller: _landUseTypeDescriptionController,
+                decoration: InputDecoration(labelText: 'Land Use Type Description'),
+                validator: (value) => value!.isEmpty ? 'Please enter a land use type description' : null,
+              ),
               TextFormField(
                 controller: _landUseDescriptionController,
                 decoration: InputDecoration(labelText: 'Land Use Description'),
