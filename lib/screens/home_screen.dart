@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'add_plant_screen.dart';
 import '../helpers/database_helper.dart';
 import 'plant_detail_screen.dart';
+import 'search_plant_screen.dart';
+import 'view_plant_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -11,11 +13,45 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late Future<List<Map<String, dynamic>>> _plantsFuture;
   final DatabaseHelper _dbHelper = DatabaseHelper();
+  int _selectedIndex = 0; // ตัวแปรเก็บ index ของ Bottom Navigation Bar
 
   @override
   void initState() {
     super.initState();
     _plantsFuture = _dbHelper.getAllPlants(); // เรียกข้อมูลพืชทั้งหมดใน initState
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index; // อัปเดต index เมื่อผู้ใช้กดปุ่มใน Bottom Navigation Bar
+    });
+
+    // ตรวจสอบว่ากดปุ่มไหน
+    if (_selectedIndex == 0) {
+      // พาไปหน้า AddPlantScreen
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => AddPlantScreen()),
+      ).then((value) {
+        if (value == true) {
+          setState(() {
+            _plantsFuture = _dbHelper.getAllPlants(); // รีเฟรชข้อมูลหลังจากกลับมาที่หน้าโฮม
+          });
+        }
+      });
+    } else if (_selectedIndex == 1) {
+      // พาไปหน้า ViewScreen 
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ViewScreen()),
+      );
+    } else if (_selectedIndex == 2) {
+      // พาไปหน้า SearchPlantScreen
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => SearchPlantScreen()),
+      );
+    }
   }
 
   @override
@@ -28,11 +64,11 @@ class _HomeScreenState extends State<HomeScreen> {
         future: _plantsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator()); // แสดงวงล้อโหลด
+            return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}')); // แสดงข้อความข้อผิดพลาด
+            return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No plants available')); // ถ้าไม่มีข้อมูล
+            return Center(child: Text('No plants available'));
           }
 
           // แสดงข้อมูลพืชใน ListView
@@ -49,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey, width: 1),
                   ),
-                  child: GestureDetector( // ใช้ GestureDetector เพื่อรองรับการแตะ
+                  child: GestureDetector(
                     onTap: () {
                       // นำทางไปยังหน้าจอรายละเอียดพืช
                       Navigator.push(
@@ -66,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       children: [
                         Text(
-                          plant['plantName'],
+                          '${plant['plantName']} : ${plant['plantScientific']}',
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 10),
@@ -90,23 +126,24 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // นำทางไปยังหน้าจอเพิ่มพรรณไม้
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddPlantScreen()),
-          ).then((value) {
-            // เรียกใช้ setState() เพื่อรีเฟรชข้อมูลหลังจากกลับมาที่หน้าโฮม
-            if (value == true) {
-              // ถ้ามีการบันทึกข้อมูลใหม่
-              setState(() {
-                _plantsFuture = _dbHelper.getAllPlants(); // เรียกข้อมูลพืชใหม่
-              });
-            }
-          });
-        },
-        child: Icon(Icons.add), // ไอคอนปุ่มเพิ่ม
+      // เพิ่ม BottomNavigationBar
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add), // ไอคอนสำหรับเพิ่มพรรณไม้
+            label: 'Add Plant',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.edit), // ไอคอนสำหรับดูพรรณไม้ทั้งหมด
+            label: 'View & Edit',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search), // ไอคอนสำหรับค้นหา
+            label: 'Search',
+          ),
+        ],
+        currentIndex: _selectedIndex, // ใช้ค่า _selectedIndex ในการบอกตำแหน่งที่เลือก
+        onTap: _onItemTapped, // เรียกใช้ฟังก์ชันเมื่อกดปุ่ม
       ),
     );
   }
